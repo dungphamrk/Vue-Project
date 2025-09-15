@@ -59,7 +59,8 @@
       const idUserLogin = localStorage.getItem('keyLogin');
       if (idUserLogin) {
         try {
-          const response = await axios.get(`http://localhost:3000/accounts/${idUserLogin}`);
+          const { buildApiUrl } = await import('@/utils/api.js');
+          const response = await axios.get(buildApiUrl(`/accounts/${idUserLogin}`));
           yourProfile.value = response.data;
         } catch (err) {
           console.error("Error fetching user data:", err);
@@ -173,8 +174,9 @@
     });
   };
   
-  const saveAccountToBackend = (account) => {
-    axios.put(`http://localhost:3000/accounts/${account.id}`, account)
+  const saveAccountToBackend = async (account) => {
+    const { buildApiUrl } = await import('@/utils/api.js');
+    axios.put(buildApiUrl(`/accounts/${account.id}`), account)
       .then(response => {
         Swal.fire("Thành công", "Thông tin cá nhân đã được cập nhật", "success");
       })

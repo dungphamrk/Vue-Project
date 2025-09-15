@@ -108,7 +108,7 @@ import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import axios from "axios";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 import CryptoJS from "crypto-js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
@@ -128,9 +128,10 @@ const errors = computed(() => store.state.account.error || {});
 const checkUnique = async () => {
   const newErrors = {};
   try {
+    const { buildApiUrl, apiHelpers } = await import('@/utils/api.js');
     const [phoneResponse, emailResponse] = await Promise.all([
-      axios.get(`http://localhost:3000/accounts?phone=${formData.value.phone}`),
-      axios.get(`http://localhost:3000/accounts?email=${formData.value.email}`)
+      axios.get(apiHelpers.filter('accounts', { phone: formData.value.phone })),
+      axios.get(apiHelpers.filter('accounts', { email: formData.value.email }))
     ]);
 
     if (phoneResponse.data.length > 0) {
@@ -201,7 +202,13 @@ const handleSubmit = async (e) => {
       
       await store.dispatch("account/addAccount", {...user});
       // Thông báo thành công
-      swal("Welcome", "Đăng kí thành công", "success");
+      Swal.fire({
+        icon: "success",
+        title: "Welcome",
+        text: "Đăng kí thành công",
+        timer: 2000,
+        showConfirmButton: false,
+      });
 
       // Điều hướng tới trang đăng nhập
       router.push("/login");
@@ -214,11 +221,18 @@ const handleSubmit = async (e) => {
       store.commit("account/SET_ERROR", {}); // Reset lại lỗi
 
     } catch (error) {
-      swal("Lỗi", "Đăng kí thất bại, vui lòng thử lại", "error");
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "Đăng kí thất bại, vui lòng thử lại",
+      });
     }
   } else {
-
-    swal("Lỗi", "Vui lòng kiểm tra lại thông tin đăng ký", "error");
+    Swal.fire({
+      icon: "error",
+      title: "Lỗi",
+      text: "Vui lòng kiểm tra lại thông tin đăng ký",
+    });
   }
 
   // Tắt trạng thái loading

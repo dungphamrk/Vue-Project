@@ -125,7 +125,8 @@ watch(countdown, (newValue) => {
 
 const fetchExam = async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/exams/${idExam.value}`);
+    const { buildApiUrl } = await import('@/utils/api.js');
+    const response = await axios.get(buildApiUrl(`/exams/${idExam.value}`));
     exam.value = response.data; 
   } catch (error) {
     console.error("Error fetching exam data:", error);
@@ -135,7 +136,8 @@ const fetchUser = async () => {
   const idUserLogin = localStorage.getItem("keyLogin");
   if (idUserLogin) {
     try {
-      const response = await axios.get("http://localhost:3000/accounts");
+      const { buildApiUrl, API_ENDPOINTS } = await import('@/utils/api.js');
+      const response = await axios.get(buildApiUrl(API_ENDPOINTS.ACCOUNTS));
       const users = response.data;
       const currentUser = users.find((user) => user.id == idUserLogin);
       if (currentUser) {
@@ -163,9 +165,9 @@ const showAlertAndRedirect = (title, text) => {
 
 const fetchQuestions = async () => {
   try {
-    const response = await axios.get("http://localhost:3000/questions");
-
-    const questions = response.data.filter((q) => q.idExam == idExam.value);
+    const { buildApiUrl, API_ENDPOINTS } = await import('@/utils/api.js');
+    const response = await axios.get(buildApiUrl(API_ENDPOINTS.QUESTIONS_BY_EXAM(idExam.value)));
+    const questions = response.data;
     console.log(response.data.filter((q) => q.idExam == idExam));
 
     shuffledQuestions.value = shuffleArray(questions);
@@ -204,9 +206,11 @@ const handleSubmit = async () => {
         await submitExamResult(examResult);
 
         updateUserProfile(score, examResult.time);
-        await axios.put(`http://localhost:3000/exams/${idExam.value}`, {
-      sequence: exam.sequence + 1, // Tăng số lượt thi
-    });
+        const { buildApiUrl } = await import('@/utils/api.js');
+        await axios.put(buildApiUrl(`/exams/${idExam.value}`), {
+          ...exam.value,
+          sequence: (exam.value.sequence || 0) + 1, // Tăng số lượt thi
+        });
 
         Swal.fire({
           title: "Nộp bài thành công!",
@@ -271,7 +275,8 @@ const prepareExamResult = (score) => {
 };
 const submitExamResult = async (examResult) => {
   try {
-    await axios.post("http://localhost:3000/userAnswers", examResult);
+    const { buildApiUrl, API_ENDPOINTS } = await import('@/utils/api.js');
+    await axios.post(buildApiUrl(API_ENDPOINTS.USER_ANSWERS), examResult);
   } catch (error) {
     console.log(error);
   }
@@ -284,8 +289,9 @@ const updateUserProfile = async (score, time) => {
       { idTest: Math.random(), score, time, date: new Date().toLocaleString() },
     ],
   };
+  const { buildApiUrl } = await import('@/utils/api.js');
   await axios.put(
-    `http://localhost:3000/accounts/${user.value.id}`,
+    buildApiUrl(`/accounts/${user.value.id}`),
     updatedUser
   );
 };

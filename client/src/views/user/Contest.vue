@@ -161,19 +161,20 @@ const route=useRoute();
 const examId = computed(() => route.params.id);
 onMounted(async () => {
   try {
+    const { buildApiUrl, API_ENDPOINTS } = await import('@/utils/api.js');
     
-    const examResponse =  await axios.get(`http://localhost:3000/exams/${examId.value}`);
+    const examResponse = await axios.get(buildApiUrl(`/exams/${examId.value}`));
     exam.value = examResponse.data;
-    const allExamsResponse = await axios.get("http://localhost:3000/exams");
+    const allExamsResponse = await axios.get(buildApiUrl(API_ENDPOINTS.EXAMS));
     const allExams = allExamsResponse.data;
     referenceExams.value = getRandomExams(allExams, 3);
-    const userResponse = await axios.get("http://localhost:3000/accounts");
+    const userResponse = await axios.get(buildApiUrl(API_ENDPOINTS.ACCOUNTS));
     const users = userResponse.data;
     const idUserLogin = typeof window !== "undefined" ? localStorage.getItem("keyLogin") : null;
     currentUser.value = idUserLogin ? users.find((user) => user.id === idUserLogin) : null;
 
     // Fetch comments for the current exam
-    const commentsResponse = await axios.get(`http://localhost:3000/comment?examId=${examId.value}`);
+    const commentsResponse = await axios.get(buildApiUrl(API_ENDPOINTS.COMMENTS_BY_EXAM(examId.value)));
     comments.value = commentsResponse.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -188,17 +189,19 @@ function getRandomExams(exams, count) {
 
 const handleAddOrUpdateComment = async () => {
   if (newComment.value.trim() === "") return;
+  
+  const { buildApiUrl, API_ENDPOINTS } = await import('@/utils/api.js');
 
   if (editingCommentId.value) {
     // Update existing comment
-    await axios.put(`http://localhost:3000/comments/${editingCommentId.value}`, {
+    await axios.put(buildApiUrl(`/comments/${editingCommentId.value}`), {
       content: newComment.value,
       date: new Date().toISOString(),
     });
     editingCommentId.value = null;
   } else {
     // Add new comment
-    await axios.post("http://localhost:3000/comments", {
+    await axios.post(buildApiUrl(API_ENDPOINTS.COMMENTS), {
       idExam: examId.value,
       idUser: currentUser.value.id,
       content: newComment.value,
@@ -206,7 +209,7 @@ const handleAddOrUpdateComment = async () => {
     });
   }
   newComment.value = "";
-  const commentsResponse = await axios.get(`http://localhost:3000/comments?examId=${examId.value}`);
+  const commentsResponse = await axios.get(buildApiUrl(API_ENDPOINTS.COMMENTS_BY_EXAM(examId.value)));
   comments.value = commentsResponse.data;
 };
 

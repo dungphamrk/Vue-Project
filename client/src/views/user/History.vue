@@ -108,14 +108,16 @@
       try {
         console.log("ID Người dùng:", idUserLogin);
         
-        const userResponse = await axios.get(`http://localhost:3000/accounts/${idUserLogin}`);
+        const { buildApiUrl, API_ENDPOINTS } = await import('@/utils/api.js');
+        
+        const userResponse = await axios.get(buildApiUrl(`/accounts/${idUserLogin}`));
         yourProfile.value = userResponse.data;
   
-        const historyResponse = await axios.get(`http://localhost:3000/userAnswers?idUser=${idUserLogin}`);
+        const historyResponse = await axios.get(buildApiUrl(API_ENDPOINTS.USER_ANSWERS_BY_USER(idUserLogin)));
         examHistory.value = historyResponse.data;
         console.log("Dữ liệu lịch sử:", examHistory.value);
   
-        const examResponse = await axios.get('http://localhost:3000/exams');
+        const examResponse = await axios.get(buildApiUrl(API_ENDPOINTS.EXAMS));
         examList.value = examResponse.data;
       } catch (err) {
         console.error('Lỗi khi lấy dữ liệu:', err);

@@ -1,181 +1,309 @@
 <template>
-  <div class="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
-    <div class="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
-      <div class="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
-        <div class="mt-12 flex flex-col items-center">
-          <h1 class="text-2xl xl:text-3xl font-extrabold">Login</h1>
-          <div class="w-full flex-1 mt-8">
-            <div class="flex flex-col items-center">
-              <button
-                class="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline"
-              >
-                <div class="bg-white p-2 rounded-full">
-                  <svg class="w-4" viewBox="0 0 533.5 544.3">
-                    <path d="M533.5 278.4c0-18.5-1.5-37.1-4.7-55.3H272.1v104.8h147c-6.1 33.8-25.7 63.7-54.4 82.7v68h87.7c51.5-47.4 81.1-117.4 81.1-200.2z" fill="#4285f4"/>
-                    <path d="M272.1 544.3c73.4 0 135.3-24.1 180.4-65.7l-87.7-68c-24.4 16.6-55.9 26-92.6 26-71 0-131.2-47.9-152.8-112.3H28.9v70.1c46.2 91.9 140.3 149.9 243.2 149.9z" fill="#34a853"/>
-                    <path d="M119.3 324.3c-11.4-33.8-11.4-70.4 0-104.2V150H28.9c-38.6 76.9-38.6 167.5 0 244.4l90.4-70.1z" fill="#fbbc04"/>
-                    <path d="M272.1 107.7c38.8-.6 76.3 14 104.4 40.8l77.7-77.7C405 24.6 339.7-.8 272.1 0 169.2 0 75.1 58 28.9 150l90.4 70.1c21.5-64.5 81.8-112.4 152.8-112.4z" fill="#ea4335"/>
-                  </svg>
-                </div>
-                <span class="ml-4"> Login with Google </span>
-              </button>
+  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <!-- Header -->
+      <div class="text-center">
+        <div class="mx-auto h-16 w-16 bg-indigo-600 rounded-full flex items-center justify-center mb-6">
+          <i class="fas fa-graduation-cap text-white text-2xl"></i>
+        </div>
+        <h2 class="text-3xl font-extrabold text-gray-900">
+          Đăng nhập vào hệ thống
+        </h2>
+        <p class="mt-2 text-sm text-gray-600">
+          Hoặc 
+          <router-link 
+            to="/register" 
+            class="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+          >
+            tạo tài khoản mới
+          </router-link>
+        </p>
+      </div>
 
-              <button
-                class="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5"
-              >
-                <div class="bg-white p-1 rounded-full">
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_(2019).svg/1365px-Facebook_f_logo_(2019).svg.png"
-                    class="w-6"
-                    alt="Facebook Logo"
-                  />
-                </div>
-                <span class="ml-4"> Login with Facebook </span>
-              </button>
+      <!-- Social Login Buttons -->
+      <div class="space-y-3">
+        <button
+          type="button"
+          class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+        >
+          <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Đăng nhập với Google
+        </button>
+
+        <button
+          type="button" 
+          class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+        >
+          <svg class="w-5 h-5 mr-3" fill="#1877F2" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          Đăng nhập với Facebook
+        </button>
+      </div>
+
+      <!-- Divider -->
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-white text-gray-500">Hoặc đăng nhập bằng email</span>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <BaseForm
+        v-model="loginForm"
+        :validation-schema="loginValidationSchema"
+        :loading="loading"
+        :show-buttons="false"
+        @submit="handleLogin"
+        ref="formRef"
+        class="space-y-6"
+      >
+        <template #default="{ errors }">
+          <div class="space-y-4">
+            <BaseInput
+              v-model="loginForm.email"
+              type="email"
+              label="Địa chỉ email"
+              placeholder="Nhập địa chỉ email của bạn"
+              required
+              :error="errors.email"
+              autocomplete="email"
+            >
+              <template #prefix-icon>
+                <i class="fas fa-envelope text-gray-400"></i>
+              </template>
+            </BaseInput>
+
+            <BaseInput
+              v-model="loginForm.password"
+              type="password"
+              label="Mật khẩu"
+              placeholder="Nhập mật khẩu của bạn"
+              required
+              :error="errors.password"
+              autocomplete="current-password"
+              show-password-toggle
+            >
+              <template #prefix-icon>
+                <i class="fas fa-lock text-gray-400"></i>
+              </template>
+            </BaseInput>
+          </div>
+
+          <!-- Remember me & Forgot password -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="remember-me"
+                v-model="rememberMe"
+                name="remember-me"
+                type="checkbox"
+                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+                Ghi nhớ đăng nhập
+              </label>
             </div>
 
-            <div class="my-12 border-b text-center">
-              <div
-                class="leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2"
-              >
-                Or login with e-mail
-              </div>
+            <div class="text-sm">
+              <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+                Quên mật khẩu?
+              </a>
             </div>
+          </div>
 
-            <div class="mx-auto max-w-xs">
-              <div class="sm:col-span-2">
-                <label for="email" class="block text-sm font-semibold leading-6 text-gray-900">Email</label>
-                <input
-                  v-model="email"
-                  class="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                  type="email"
-                  placeholder="Email"
-                />
-                <div v-if="errors.email" class="text-red-500 text-sm text-center">
-                  {{ errors.email }}
-                </div>
-              </div>
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            :disabled="loading"
+            :class="[
+              'group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200',
+              loading
+                ? 'bg-indigo-400 cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg transform hover:-translate-y-0.5'
+            ]"
+          >
+            <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
+              <div class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+            </span>
+            
+            <span v-if="!loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
+              <i class="fas fa-sign-in-alt group-hover:translate-x-1 transition-transform"></i>
+            </span>
+            
+            {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+          </button>
+        </template>
+      </BaseForm>
 
-              <div class="sm:col-span-2 mt-5">
-                <label for="password" class="block text-sm font-semibold leading-6 text-gray-900">Password</label>
-                <input
-                  v-model="password"
-                  class="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                  type="password"
-                  placeholder="Password"
-                />
-                <div v-if="errors.password" class="text-red-500 text-sm text-center">
-                  {{ errors.password }}
-                </div>
-              </div>
+      <!-- Sign up link -->
+      <div class="text-center">
+        <p class="text-sm text-gray-600">
+          Chưa có tài khoản?
+          <router-link 
+            to="/register" 
+            class="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+          >
+            Đăng ký ngay
+          </router-link>
+        </p>
+      </div>
 
-              <button
-                @click="handleSubmit"
-                class="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
-              >
-                <span> Login </span>
-              </button>
-              <p class="mt-10 text-center text-sm text-gray-700">
-                Don't have an account?
-                <router-link to="/register" class="font-semibold text-indigo-500 hover:text-indigo-800">Sign up here</router-link>
-              </p>
-            </div>
+      <!-- Demo accounts -->
+      <div class="bg-gray-50 rounded-lg p-4 mt-6">
+        <h3 class="text-sm font-medium text-gray-900 mb-3">Tài khoản demo:</h3>
+        <div class="space-y-2 text-xs text-gray-600">
+          <div class="flex justify-between">
+            <span>👤 Admin:</span>
+            <button 
+              @click="fillDemoAccount('admin')"
+              class="text-indigo-600 hover:text-indigo-500 underline"
+            >
+              admin@demo.com / admin123
+            </button>
+          </div>
+          <div class="flex justify-between">
+            <span>👨‍🎓 User:</span>
+            <button 
+              @click="fillDemoAccount('user')"
+              class="text-indigo-600 hover:text-indigo-500 underline"
+            >
+              user@demo.com / user123
+            </button>
           </div>
         </div>
       </div>
-      <div class="flex-1 bg-indigo-100 text-center hidden lg:flex">
-        <div
-          class="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
-          style="background-image: url('https://storage.googleapis.com/devitary-image-host.appspot.com/15848031292911696601-undraw_designer_life_w96d.svg');"
-        ></div>
-      </div>
+    </div>
+
+    <!-- Background decoration -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+      <div class="absolute -top-10 -left-10 w-40 h-40 bg-indigo-100 rounded-full opacity-50 animate-pulse"></div>
+      <div class="absolute top-1/4 -right-10 w-32 h-32 bg-cyan-100 rounded-full opacity-50 animate-pulse delay-1000"></div>
+      <div class="absolute -bottom-10 left-1/4 w-48 h-48 bg-purple-100 rounded-full opacity-50 animate-pulse delay-2000"></div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import axios from 'axios';
-import CryptoJS from 'crypto-js';
-import Swal from 'sweetalert2';
-import router from '@/router';
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { BaseForm, BaseInput } from '@/components/common'
+import { useAuth } from '@/composables'
+import { validationSchemas } from '@/utils'
 
-const email = ref('');
-const password = ref('');
-const errors = ref({});
+// Composables
+const router = useRouter()
+const { login, loading } = useAuth()
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+// Reactive data
+const formRef = ref(null)
+const rememberMe = ref(false)
 
-  // Kiểm tra lỗi nhập
-  const formErrors = {};
-  if (!email.value) formErrors.email = 'Email không được để trống';
-  if (!password.value) formErrors.password = 'Mật khẩu không được để trống';
+const loginForm = ref({
+  email: '',
+  password: '',
+})
 
-  if (Object.keys(formErrors).length > 0) {
-    errors.value = formErrors;
-    return;
+// Validation schema
+const loginValidationSchema = computed(() => validationSchemas.login)
+
+// Demo accounts
+const demoAccounts = {
+  admin: {
+    email: 'admin@demo.com',
+    password: 'admin123'
+  },
+  user: {
+    email: 'user@demo.com', 
+    password: 'user123'
+  }
+}
+
+// Methods
+const handleLogin = async () => {
+  if (!formRef.value?.validate()) {
+    return
   }
 
   try {
-    // Gọi API để lấy danh sách người dùng
-    const response = await axios.get('http://localhost:3000/accounts');
-    const users = response.data;
-
-    // Tìm người dùng có email trùng khớp
-    const currentUser = users.find((user) => user.email === email.value);
-  console.log(currentUser);
-    if (currentUser) {
-      const decryptedPassword = CryptoJS.DES.decrypt(
-  currentUser.password,
-  "secret_key"
-).toString(CryptoJS.enc.Utf8);
-      
-      
-      if (decryptedPassword === password.value) {
-        if (currentUser.lock === 'lock') {
-          Swal.fire({
-            icon: 'error',
-            title: 'Tài khoản bị khóa',
-            text: 'Tài khoản này đã bị khóa!',
-          });
-        } else {
-          localStorage.setItem('keyLogin', currentUser.id);
-          localStorage.setItem('userRole', currentUser.role);
-          await axios.patch(`http://localhost:3000/accounts/${currentUser.id}`, { status: 1 });
-          Swal.fire({
-            icon: 'success',
-            title: 'Đăng nhập thành công',
-            text: 'Bạn đã đăng nhập thành công!',
-          }).then(() => {
-            router.push('/user/home'); 
-          });
-        }
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Đăng nhập thất bại',
-          text: 'Tài khoản hoặc mật khẩu không đúng!',
-        });
+    const result = await login(loginForm.value)
+    
+    if (result.success) {
+      // Handle remember me
+      if (rememberMe.value) {
+        localStorage.setItem('rememberLogin', 'true')
       }
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Đăng nhập thất bại',
-        text: 'Tài khoản hoặc mật khẩu không đúng!',
-      });
+      
+      // Navigation is handled in useAuth composable
     }
   } catch (error) {
-    console.error('Error during login:', error);
-    Swal.fire({
-      icon: 'error',
-      title: 'Lỗi',
-      text: 'Có lỗi xảy ra trong quá trình đăng nhập!',
-    });
+    console.error('Login error:', error)
   }
-};
+}
 
+const fillDemoAccount = (type) => {
+  const account = demoAccounts[type]
+  if (account) {
+    loginForm.value.email = account.email
+    loginForm.value.password = account.password
+  }
+}
+
+// Auto-fill from remember me
+const checkRememberMe = () => {
+  const remembered = localStorage.getItem('rememberLogin')
+  if (remembered) {
+    rememberMe.value = true
+    // You could also restore email from localStorage here
+  }
+}
+
+// Lifecycle
+checkRememberMe()
 </script>
-  
 
-  
+<style scoped>
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Gradient background enhancement */
+.bg-gradient-to-br {
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Button hover effects */
+.group:hover .group-hover\:translate-x-1 {
+  transform: translateX(0.25rem);
+}
+
+/* Social button icons */
+.social-icon {
+  transition: transform 0.2s ease;
+}
+
+.social-icon:hover {
+  transform: scale(1.05);
+}
+</style>

@@ -9,7 +9,9 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "json-server --watch db.json"
+    "dev": "json-server --watch db.json --port 3000 --host localhost",
+    "start": "json-server --watch db.json --port 3000 --host localhost",
+    "dev:port": "json-server --watch db.json --port"
   },
   "author": "",
   "license": "ISC",

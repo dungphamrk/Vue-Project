@@ -173,7 +173,7 @@ import {
   CaretUpOutlined,
   SearchOutlined,
 } from "@ant-design/icons-vue";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 import SubjectModal from "@/components/admin/modal/SubjectModal.vue";
 import { useRoute, useRouter } from "vue-router";
 const router= useRouter();
@@ -209,16 +209,24 @@ onMounted(() => {
 });
 
 const handleDeleteSubject = (id) => {
-  swal({
+  Swal.fire({
     title: "Cảnh báo?",
-    text: "Bạn sẽ khóa tài khoản này!",
+    text: "Bạn có chắc muốn xóa môn học này?",
     icon: "warning",
-    dangerMode: true,
-  }).then((willDelete) => {
-    if (willDelete) {
+    showCancelButton: true,
+    confirmButtonText: "Xóa",
+    cancelButtonText: "Hủy",
+    confirmButtonColor: "#dc2626",
+  }).then((result) => {
+    if (result.isConfirmed) {
       store.dispatch("subject/deleteSubject", id);
-    } else {
-      swal("Your account is safe!");
+      Swal.fire({
+        icon: "success",
+        title: "Đã xóa!",
+        text: "Môn học đã được xóa thành công",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   });
 };

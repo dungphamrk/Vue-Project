@@ -69,7 +69,7 @@
   </template>
   
   <script setup>
-  import "@/styles/courses.css";
+  // CSS styles moved to global stylesheet
   import { ref, computed, watch } from 'vue';
   import { useStore } from 'vuex';
   

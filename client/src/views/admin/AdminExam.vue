@@ -159,7 +159,7 @@ import {
   CaretUpOutlined,
   SearchOutlined,
 } from "@ant-design/icons-vue";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 import ExamModal from "@/components/admin/modal/ExamModal.vue"; // Updated to ExamModal
 import { useRoute, useRouter } from "vue-router";
 import subject from "@/store/modules/subject";

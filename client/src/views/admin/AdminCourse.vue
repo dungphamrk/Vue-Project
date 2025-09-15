@@ -172,7 +172,7 @@ import {
   CaretUpOutlined,
   SearchOutlined,
 } from "@ant-design/icons-vue";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 import CourseModal from "@/components/admin/modal/CourseModal.vue";
 import { useRouter } from "vue-router";
 const store = useStore();
@@ -203,19 +203,26 @@ onMounted(() => {
 });
 
 const handleDeleteCourse = (id) => {
-  swal({
+  Swal.fire({
     title: "Cảnh báo?",
-    text: "Bạn sẽ khóa tài khoản này!",
+    text: "Bạn có chắc muốn xóa khóa học này?",
     icon: "warning",
-    dangerMode: true,
-  }).then((willDelete) => {
-    if (willDelete) {
+    showCancelButton: true,
+    confirmButtonText: "Xóa",
+    cancelButtonText: "Hủy",
+    confirmButtonColor: "#dc2626",
+  }).then((result) => {
+    if (result.isConfirmed) {
       store.dispatch("course/deleteCourse", id);
-    } else {
-      swal("Your account is safe!");
+      Swal.fire({
+        icon: "success",
+        title: "Đã xóa!",
+        text: "Khóa học đã được xóa thành công",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   });
- 
 };
 
 const toggleSort = (field) => {

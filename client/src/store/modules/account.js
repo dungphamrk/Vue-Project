@@ -1,96 +1,144 @@
-import axios from 'axios';
+import { accountService } from '../../services/index.js';
 
 const state = {
-  account: [], 
+  accounts: [], 
   loading: false,
-  error: {},
-  totalPages:0
+  error: null,
+  totalPages: 0,
 };
 
 const mutations = {
-  SET_PAGES (state,totalPages){
-    state.totalPages=totalPages
+  SET_PAGES(state, totalPages) {
+    state.totalPages = totalPages;
   },
-  SET_ACCOUNT(state, account) {
-    state.account = account;
+  SET_ACCOUNTS(state, accounts) {
+    state.accounts = accounts;
   },
   SET_LOADING(state, status) {
-    state.loading = {...status};
+    state.loading = status;
   },
   SET_ERROR(state, error) {
-    state.error = {...error};
+    state.error = error;
   },
   ADD_ACCOUNT(state, account) {
-    state.account.push(account);
+    state.accounts.push(account);
   },
   UPDATE_ACCOUNT(state, updatedAccount) {
-    const index = state.account.findIndex(p => p.id === updatedAccount.id);
+    const index = state.accounts.findIndex(account => account.id === updatedAccount.id);
     if (index !== -1) {
-      state.account.splice(index, 1, updatedAccount);
+      state.accounts.splice(index, 1, updatedAccount);
     }
   },
-  DELETE_ACCOUNT(state, accountId) { // Chỉnh sửa tên biến ở đây
-    state.account = state.account.filter(p => p.id !== accountId);
-  }
+  DELETE_ACCOUNT(state, accountId) {
+    state.accounts = state.accounts.filter(account => account.id !== accountId);
+  },
+  CLEAR_ERROR(state) {
+    state.error = null;
+  },
 };
 
 const actions = {
   async fetchAccounts({ commit }) {
     commit('SET_LOADING', true);
-    try {
-      const response = await axios.get('http://localhost:3000/accounts');
-      commit('SET_ACCOUNT', response.data);
-      commit('SET_LOADING', false);
-    } catch (error) {
-      commit('SET_ERROR', 'Failed to fetch accounts');
-      commit('SET_LOADING', false);
+    commit('CLEAR_ERROR');
+    
+    const result = await accountService.getAll();
+    
+    if (result.success) {
+      commit('SET_ACCOUNTS', result.data);
+    } else {
+      commit('SET_ERROR', result.error);
     }
+    
+    commit('SET_LOADING', false);
   },
-  async fetchPaginatedAccounts({ commit }, { page, limit }) {
-    try {
-      const response = await axios.get(
-        `http://localhost:3000/accounts?_page=${page}&_limit=${limit}`
-      );
-      const totalPages = Math.ceil(
-        parseInt(response.headers["x-total-count"]) / limit
-      );
-      commit("SET_ACCOUNT",  response.data );
-      commit("SET_PAGES",  totalPages );
 
-    } catch (error) {
-      console.error("Error fetching accounts:", error);
+  async fetchPaginatedAccounts({ commit }, { page = 1, limit = 10 }) {
+    commit('SET_LOADING', true);
+    commit('CLEAR_ERROR');
+    
+    const result = await accountService.getPaginated(page, limit);
+    
+    if (result.success) {
+      commit('SET_ACCOUNTS', result.data);
+      commit('SET_PAGES', result.totalPages);
+    } else {
+      commit('SET_ERROR', result.error);
     }
+    
+    commit('SET_LOADING', false);
   },
-  async addAccount({ commit }, account) {
-    try {
-      const response = await axios.post('http://localhost:3000/accounts', account);
-      console.log(response.data);
-      commit('ADD_ACCOUNT', response.data);
-      
-    } catch (error) {
-      commit('SET_ERROR', 'Failed to add Account');
+
+  async addAccount({ commit }, accountData) {
+    commit('SET_LOADING', true);
+    commit('CLEAR_ERROR');
+    
+    const result = await accountService.create(accountData);
+    
+    if (result.success) {
+      commit('ADD_ACCOUNT', result.data);
+      return { success: true, data: result.data };
+    } else {
+      commit('SET_ERROR', result.error);
+      return { success: false, error: result.error };
     }
+    
+    commit('SET_LOADING', false);
   },
+
   async updateAccount({ commit }, account) {
-    try {
-      const response = await axios.put(`http://localhost:3000/accounts/${account.id}`, account); 
-      commit('UPDATE_ACCOUNT', response.data);
-    } catch (error) {
-      commit('SET_ERROR', 'Failed to update Account');
+    commit('SET_LOADING', true);
+    commit('CLEAR_ERROR');
+    
+    const result = await accountService.update(account.id, account);
+    
+    if (result.success) {
+      commit('UPDATE_ACCOUNT', result.data);
+      return { success: true, data: result.data };
+    } else {
+      commit('SET_ERROR', result.error);
+      return { success: false, error: result.error };
+    }
+    
+    commit('SET_LOADING', false);
+  },
+
+  async deleteAccount({ commit }, accountId) {
+    commit('SET_LOADING', true);
+    commit('CLEAR_ERROR');
+    
+    const result = await accountService.delete(accountId);
+    
+    if (result.success) {
+      commit('DELETE_ACCOUNT', accountId);
+      return { success: true };
+    } else {
+      commit('SET_ERROR', result.error);
+      return { success: false, error: result.error };
+    }
+    
+    commit('SET_LOADING', false);
+  },
+
+  async loginUser({ commit }, credentials) {
+    commit('SET_LOADING', true);
+    commit('CLEAR_ERROR');
+    
+    const result = await accountService.login(credentials);
+    
+    commit('SET_LOADING', false);
+    
+    if (result.success) {
+      return { success: true, user: result.data };
+    } else {
+      commit('SET_ERROR', result.error);
+      return { success: false, error: result.error };
     }
   },
-  async deleteAccount({ commit }, accountId) {
-    try {
-      await axios.delete(`http://localhost:3000/accounts/${accountId}`);
-      commit('DELETE_ACCOUNT', accountId); // Chỉnh sửa tên mutation
-    } catch (error) {
-      commit('SET_ERROR', 'Failed to delete Account');
-    }
-  }
 };
 
 const getters = {
-  allAccounts: (state) => state.account,
+  allAccounts: (state) => state.accounts,
   isLoading: (state) => state.loading,
   hasError: (state) => state.error,
   totalPages: (state) => state.totalPages,

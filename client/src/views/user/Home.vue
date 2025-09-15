@@ -37,12 +37,13 @@
   import Banner from '@/components/user/Banner.vue';
   import Banner2 from '@/components/user/Bannergv.vue';
   import Footer from '@/components/user/Footer.vue';
-  import "@/styles/home.css"
+  // CSS styles moved to global stylesheet
   const topExams = ref([]);
   
   const fetchExams = async () => {
     try {
-      const { data } = await axios.get('http://localhost:3000/exams');
+      const { buildApiUrl, API_ENDPOINTS } = await import('@/utils/api.js');
+      const { data } = await axios.get(buildApiUrl(API_ENDPOINTS.EXAMS));
       topExams.value = data
         .sort((a, b) => b.sequence - a.sequence) // Sắp xếp giảm dần theo sequence
         .slice(0, 6); // Lấy 4 đề thi có lượt thi cao nhất

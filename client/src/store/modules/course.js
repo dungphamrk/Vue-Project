@@ -1,95 +1,128 @@
-import axios from 'axios';
+import { courseService } from '../../services/index.js';
 
 const state = {
-  course: [], 
+  courses: [],
   loading: false,
-  error: {},
-  totalPages:0
+  error: null,
+  totalPages: 0,
 };
 
 const mutations = {
-  SET_PAGES (state,totalPages){
-    state.totalPages=totalPages
+  SET_PAGES(state, totalPages) {
+    state.totalPages = totalPages;
   },
-  SET_COURSE(state, course) {
-    state.course = course;
+  SET_COURSES(state, courses) {
+    state.courses = courses;
   },
   SET_LOADING(state, status) {
-    state.loading = {...status};
+    state.loading = status;
   },
   SET_ERROR(state, error) {
-    state.error = {...error};
+    state.error = error;
   },
   ADD_COURSE(state, course) {
-    state.course.push(course);
+    state.courses.push(course);
   },
-  UPDATE_COURSE(state, updatedcourse) {
-    const index = state.course.findIndex(p => p.id === updatedCourse.id);
+  UPDATE_COURSE(state, updatedCourse) {
+    const index = state.courses.findIndex(course => course.id === updatedCourse.id);
     if (index !== -1) {
-      state.course.splice(index, 1, updatedCourse);
+      state.courses.splice(index, 1, updatedCourse);
     }
   },
-  DELETE_COURSE(state, courseId) { // Chỉnh sửa tên biến ở đây
-    state.course = state.course.filter(p => p.id !== courseId);
-  }
+  DELETE_COURSE(state, courseId) {
+    state.courses = state.courses.filter(course => course.id !== courseId);
+  },
+  CLEAR_ERROR(state) {
+    state.error = null;
+  },
 };
 
 const actions = {
-  async fetchCourses({ commit },{id}) {
+  async fetchCourses({ commit }, { id } = {}) {
     commit('SET_LOADING', true);
-    try {
-      const response = await axios.get(`http://localhost:3000/courses?id=${id}`);
-      commit('SET_COURSE', response.data);
-      commit('SET_LOADING', false);
-    } catch (error) {
-      commit('SET_ERROR', 'Failed to fetch courses');
-      commit('SET_LOADING', false);
+    commit('CLEAR_ERROR');
+    
+    const result = id ? await courseService.getById(id) : await courseService.getAll();
+    
+    if (result.success) {
+      commit('SET_COURSES', result.data);
+    } else {
+      commit('SET_ERROR', result.error);
     }
+    
+    commit('SET_LOADING', false);
   },
-  async fetchPaginatedCourses({ commit }, { page, limit }) {
-    try {
-      const response = await axios.get(
-        `http://localhost:3000/courses?_page=${page}&_limit=${limit}`
-      );
-      const totalPages = Math.ceil(
-        parseInt(response.headers["x-total-count"]) / limit
-      );
-      console.log(totalPages.value);
-      
-      commit("SET_COURSE",  response.data );
-      commit("SET_PAGES",  totalPages );
 
-    } catch (error) {
-      console.error("Error fetching courses:", error);
+  async fetchPaginatedCourses({ commit }, { page = 1, limit = 10 }) {
+    commit('SET_LOADING', true);
+    commit('CLEAR_ERROR');
+    
+    const result = await courseService.getPaginated(page, limit);
+    
+    if (result.success) {
+      commit('SET_COURSES', result.data);
+      commit('SET_PAGES', result.totalPages);
+    } else {
+      commit('SET_ERROR', result.error);
     }
-  }, 
-  async addCourse({ commit }, course) {
-    try {
-      const response = await axios.post('http://localhost:3000/courses', course);
-    } catch (error) {
-      commit('SET_ERROR', 'Failed to add course');
-    }
+    
+    commit('SET_LOADING', false);
   },
+
+  async addCourse({ commit }, courseData) {
+    commit('SET_LOADING', true);
+    commit('CLEAR_ERROR');
+    
+    const result = await courseService.create(courseData);
+    
+    if (result.success) {
+      commit('ADD_COURSE', result.data);
+      return { success: true, data: result.data };
+    } else {
+      commit('SET_ERROR', result.error);
+      return { success: false, error: result.error };
+    }
+    
+    commit('SET_LOADING', false);
+  },
+
   async updateCourse({ commit }, course) {
-    try {
-      const response = await axios.put(`http://localhost:3000/courses/${course.id}`, course); 
-      commit('UPDATE_COURSE', response.data);
-    } catch (error) {
-      commit('SET_ERROR', 'Failed to update course');
+    commit('SET_LOADING', true);
+    commit('CLEAR_ERROR');
+    
+    const result = await courseService.update(course.id, course);
+    
+    if (result.success) {
+      commit('UPDATE_COURSE', result.data);
+      return { success: true, data: result.data };
+    } else {
+      commit('SET_ERROR', result.error);
+      return { success: false, error: result.error };
     }
+    
+    commit('SET_LOADING', false);
   },
+
   async deleteCourse({ commit }, courseId) {
-    try {
-      await axios.delete(`http://localhost:3000/courses/${courseId}`);
-      commit('DELETE_COURSE', courseId); // Chỉnh sửa tên mutation
-    } catch (error) {
-      commit('SET_ERROR', 'Failed to delete course');
+    commit('SET_LOADING', true);
+    commit('CLEAR_ERROR');
+    
+    const result = await courseService.delete(courseId);
+    
+    if (result.success) {
+      commit('DELETE_COURSE', courseId);
+      return { success: true };
+    } else {
+      commit('SET_ERROR', result.error);
+      return { success: false, error: result.error };
     }
-  }
+    
+    commit('SET_LOADING', false);
+  },
 };
 
 const getters = {
-  allCourses: (state) => state.course,
+  allCourses: (state) => state.courses,
   isLoading: (state) => state.loading,
   hasError: (state) => state.error,
   totalPages: (state) => state.totalPages,
@@ -100,5 +133,5 @@ export default {
   state,
   mutations,
   actions,
-  getters
+  getters,
 };

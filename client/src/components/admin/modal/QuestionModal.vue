@@ -1,107 +1,178 @@
 <template>
-  <div v-if="isOpen && modalType === 'questionModal'" class="fixed z-10 inset-0 overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-      </div>
-      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-          <!-- Tên bài thi -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Tên bài thi</label>
-            <input
-              type="text"
-              :value="examName"
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              readonly
-            />
-          </div>
+  <BaseModal
+    :show="isOpen && modalType === 'questionModal'"
+    :title="modalData ? 'Chỉnh sửa câu hỏi' : 'Thêm câu hỏi mới'"
+    :loading="loading"
+    size="xl"
+    @close="handleCloseModal"
+    @confirm="handleSaveQuestion"
+    confirm-text="Lưu"
+    cancel-text="Hủy"
+  >
+    <BaseForm
+      v-model="questionForm"
+      :validation-schema="validationSchema"
+      :loading="loading"
+      :show-buttons="false"
+      @submit="handleSaveQuestion"
+      ref="formRef"
+    >
+      <template #default="{ errors }">
+        <!-- Question Text -->
+        <BaseInput
+          v-model="questionForm.text"
+          type="textarea"
+          label="Câu hỏi"
+          placeholder="Nhập nội dung câu hỏi"
+          required
+          :error="errors.text"
+          :rows="4"
+          maxlength="1000"
+          show-char-count
+        />
 
-          <!-- Tên câu hỏi -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Tên câu hỏi</label>
-            <input
-              type="text"
-              v-model="questionForm.text"
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-            />
-            <p v-if="errors.text" class="text-red-500 text-sm mt-1">{{ errors.text }}</p>
-          </div>
+        <!-- Exam (Display Only) -->
+        <BaseInput
+          :model-value="examName"
+          label="Bài thi"
+          disabled
+          readonly
+        />
 
-          <!-- Danh sách câu trả lời cố định -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Danh sách câu trả lời</label>
-            <div v-for="(answer, index) in questionForm.answerList" :key="index" class="flex items-center space-x-2 mb-2">
+        <!-- Question Sequence -->
+        <BaseInput
+          v-model.number="questionForm.sequence"
+          type="number"
+          label="Thứ tự câu hỏi"
+          placeholder="Nhập thứ tự câu hỏi"
+          :min="1"
+          :error="errors.sequence"
+        />
+
+        <!-- Answer Options -->
+        <div class="space-y-4">
+          <h4 class="text-lg font-medium text-gray-900">Các đáp án</h4>
+          
+          <div 
+            v-for="(answer, index) in questionForm.answerList" 
+            :key="index"
+            class="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg"
+          >
+            <!-- Radio button for correct answer -->
+            <div class="flex items-center h-10">
               <input
-                type="text"
-                v-model="answer.answer"
-                placeholder="Nhập câu trả lời"
-                class="block w-3/4 px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              />
-              <input
+                :id="`answer-${index}`"
                 type="radio"
                 :value="index"
                 v-model="selectedAnswer"
-                @change="setCorrectAnswer(index)"
-                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
               />
             </div>
-            <p v-if="errors.answerList" class="text-red-500 text-sm mt-1">{{ errors.answerList }}</p>
-            <p v-if="errors.correctAnswer" class="text-red-500 text-sm mt-1">{{ errors.correctAnswer }}</p>
+            
+            <!-- Answer input -->
+            <div class="flex-1">
+              <label 
+                :for="`answer-input-${index}`"
+                class="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Đáp án {{ String.fromCharCode(65 + index) }}
+                <span v-if="selectedAnswer === index" class="text-green-600 font-semibold"> (Đúng)</span>
+              </label>
+              <BaseInput
+                :id="`answer-input-${index}`"
+                v-model="answer.answer"
+                placeholder="Nhập nội dung đáp án"
+                :error="answerErrors[index]"
+                maxlength="200"
+              />
+            </div>
           </div>
 
-          <!-- Nút lưu -->
-          <button type="button" @click="handleSaveQuestion" class="bg-indigo-600 text-white px-4 py-2 rounded-md">
-            Lưu
-          </button>
-          <button type="button" @click="handleCloseModal" class="ml-4 bg-gray-600 text-white px-4 py-2 rounded-md">
-            Hủy
-          </button>
+          <!-- Answer validation errors -->
+          <div v-if="answerValidationError" class="text-red-600 text-sm">
+            {{ answerValidationError }}
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
+
+        <!-- Instructions -->
+        <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-blue-800">
+                Hướng dẫn
+              </h3>
+              <div class="mt-2 text-sm text-blue-700">
+                <ul class="list-disc list-inside space-y-1">
+                  <li>Nhập nội dung cho tất cả 4 đáp án</li>
+                  <li>Chọn radio button để đánh dấu đáp án đúng</li>
+                  <li>Mỗi câu hỏi phải có đúng 1 đáp án đúng</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </BaseForm>
+  </BaseModal>
 </template>
 
 <script setup>
 import { useStore } from 'vuex';
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { BaseModal, BaseForm, BaseInput } from '../../common/index.js';
+import { validationSchemas, validateAnswerList, DEFAULT_VALUES } from '../../../utils/index.js';
+import Swal from 'sweetalert2';
 
-const route = useRoute(); 
 const store = useStore();
+const route = useRoute();
+const formRef = ref(null);
+
+// Route params
 const examId = computed(() => route.params.id);
 
+// Computed properties
 const isOpen = computed(() => store.state.modal.isOpen);
 const modalType = computed(() => store.state.modal.modalType);
 const modalData = computed(() => store.state.modal.modalData);
 const exams = computed(() => store.state.exam.exams);
+const loading = computed(() => store.state.question.loading);
+
+// Form data
 const questionForm = ref({
-  idExam: '',
-  requence: 0, 
   text: '',
-  answerList: [
-    { answer: '', status: 0 },
-    { answer: '', status: 0 },
-    { answer: '', status: 0 },
-    { answer: '', status: 0 },
-  ],
+  idExam: examId.value,
+  sequence: 0,
+  answerList: [...DEFAULT_VALUES.QUESTION.answerList],
 });
+
 const selectedAnswer = ref(null);
-const errors = ref({}); // Error messages for validation
+const answerErrors = ref({});
+const answerValidationError = ref('');
 
+// Computed values
 const examName = computed(() => {
-  const exam = exams.value.find((c) => c.id === questionForm.value.idExam);
-  return exam ? exam.name : "";
+  const exam = exams.value.find((e) => e.id === examId.value);
+  return exam ? exam.name : 'Đang tải...';
 });
 
+// Validation schema
+const validationSchema = computed(() => validationSchemas.question);
+
+// Lifecycle
 onMounted(() => {
+  // Fetch exam data to display exam name
   if (!exams.value || exams.value.length === 0) {
-    store.dispatch("exam/fetchExams", { id: examId.value });
+    store.dispatch('exam/fetchExams', { id: examId.value });
   }
 });
 
+// Watch for modal data changes
 watch([modalData, exams], ([newData, newExams]) => {
   if (newData) {
     questionForm.value = { ...newData };
@@ -111,68 +182,103 @@ watch([modalData, exams], ([newData, newExams]) => {
     resetForm();
     questionForm.value.idExam = examId.value;
   }
-  if (newExams && questionForm.value.idExam) {
-    const exam = newExams.find((c) => c.id === questionForm.value.idExam);
-    examName.value = exam ? exam.name : "";
+});
+
+// Watch for selected answer changes
+watch(selectedAnswer, (newIndex) => {
+  if (newIndex !== null) {
+    questionForm.value.answerList.forEach((answer, index) => {
+      answer.status = index === newIndex ? 1 : 0;
+    });
   }
 });
 
+// Methods
 const resetForm = () => {
   questionForm.value = {
-    idExam: '',
-    requence: 0,
     text: '',
-    answerList: [
-      { answer: '', status: 0 },
-      { answer: '', status: 0 },
-      { answer: '', status: 0 },
-      { answer: '', status: 0 },
-    ],
+    idExam: examId.value,
+    sequence: 0,
+    answerList: [...DEFAULT_VALUES.QUESTION.answerList],
   };
   selectedAnswer.value = null;
-  errors.value = {}; // Clear errors
+  answerErrors.value = {};
+  answerValidationError.value = '';
+  formRef.value?.clearErrors();
 };
 
-const setCorrectAnswer = (index) => {
-  questionForm.value.answerList.forEach((answer, i) => {
-    answer.status = i === index ? 1 : 0;
-  });
-  selectedAnswer.value = index;
+const validateAnswers = () => {
+  const validation = validateAnswerList(questionForm.value.answerList, selectedAnswer.value);
+  
+  answerErrors.value = {};
+  answerValidationError.value = '';
+  
+  if (!validation.isValid) {
+    if (validation.errors.answerList) {
+      answerValidationError.value = validation.errors.answerList;
+      // Mark empty answers with error
+      questionForm.value.answerList.forEach((answer, index) => {
+        if (!answer.answer || !answer.answer.trim()) {
+          answerErrors.value[index] = 'Đáp án không được để trống';
+        }
+      });
+    }
+    
+    if (validation.errors.correctAnswer) {
+      answerValidationError.value = validation.errors.correctAnswer;
+    }
+  }
+  
+  return validation.isValid;
 };
 
-const validateForm = () => {
-  errors.value = {}; // Reset errors
-
-  // Validate question text
-  if (!questionForm.value.text) {
-    errors.value.text = "Tên câu hỏi không được để trống.";
+const handleSaveQuestion = async () => {
+  // Validate form first
+  const formValid = formRef.value?.validate();
+  const answersValid = validateAnswers();
+  
+  if (!formValid || !answersValid) {
+    return;
   }
 
-  // Validate answer list (all answers must be filled and exactly 4 answers)
-  if (questionForm.value.answerList.some(answer => !answer.answer)) {
-    errors.value.answerList = "Tất cả câu trả lời phải được điền.";
-  }
+  try {
+    let result;
+    if (modalData.value) {
+      // Update existing question
+      result = await store.dispatch('question/updateQuestion', {
+        ...questionForm.value,
+        id: modalData.value.id,
+      });
+    } else {
+      // Create new question
+      result = await store.dispatch('question/addQuestion', questionForm.value);
+    }
 
-  // Validate correct answer selection
-  if (selectedAnswer.value === null) {
-    errors.value.correctAnswer = "Phải chọn một câu trả lời đúng.";
-  }
-
-  return Object.keys(errors.value).length === 0;
-};
-
-const handleSaveQuestion = () => {
-  if (!validateForm()) return; // Stop if validation fails
-
-  if (modalData.value) {
-    store.dispatch('question/updateQuestion', {
-      ...questionForm.value,
-      id: modalData.value.id,
+    if (result?.success !== false) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Thành công!',
+        text: modalData.value ? 'Cập nhật câu hỏi thành công' : 'Thêm câu hỏi thành công',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      
+      // Refresh question list
+      store.dispatch('question/fetchPaginatedQuestions', { 
+        page: 1, 
+        limit: 10, 
+        examId: examId.value 
+      });
+      handleCloseModal();
+    }
+  } catch (error) {
+    console.error('Error saving question:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Có lỗi xảy ra',
+      text: 'Không thể lưu câu hỏi. Vui lòng thử lại.',
     });
-  } else {
-    store.dispatch('question/addQuestion', questionForm.value);
   }
-  handleCloseModal();
 };
 
 const handleCloseModal = () => {

@@ -1,8 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Swal from 'sweetalert2';
+import { STORAGE_KEYS, USER_ROLES, ROUTES } from '../utils/constants.js';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  // Scroll behavior for better UX
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else if (to.hash) {
+      return { el: to.hash, behavior: 'smooth' };
+    } else {
+      return { top: 0, behavior: 'smooth' };
+    }
+  },
   routes: [
     {
       path: '/admin',
@@ -109,29 +120,74 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem('keyLogin'); 
-  const isAdmin = localStorage.getItem('userRole') === 'true'; 
+// Navigation guards
+router.beforeEach(async (to, from, next) => {
+  // Show loading indicator for route changes
+  if (to.name !== from.name) {
+    document.body.style.cursor = 'wait';
+  }
 
+  const isAuthenticated = !!localStorage.getItem(STORAGE_KEYS.LOGIN_KEY);
+  const userRole = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
+  const isAdmin = userRole === USER_ROLES.ADMIN;
+
+  // Check authentication requirements
   if (to.meta.requiresAuth) {
     if (!isAuthenticated) {
-      Swal.fire({
+      await Swal.fire({
         icon: 'warning',
         title: 'Yêu cầu đăng nhập',
         text: 'Vui lòng đăng nhập để tiếp tục.',
+        confirmButtonText: 'Đăng nhập',
       });
-      return; 
+      
+      next({ 
+        name: 'Login', 
+        query: { redirect: to.fullPath } 
+      });
+      return;
     }
+    
+    // Check admin access
     if (to.meta.adminOnly && !isAdmin) {
-      Swal.fire({
+      await Swal.fire({
         icon: 'error',
         title: 'Truy cập bị từ chối',
         text: 'Bạn không có quyền truy cập vào khu vực quản trị.',
+        confirmButtonText: 'Về trang chủ',
       });
-      return; 
+      
+      next({ name: 'UserHome' });
+      return;
     }
   }
+
+  // Redirect authenticated users away from auth pages
+  if (isAuthenticated && (to.name === 'Login' || to.name === 'Register')) {
+    const redirectTo = isAdmin ? { name: 'AdminAccount' } : { name: 'UserHome' };
+    next(redirectTo);
+    return;
+  }
+
   next();
+});
+
+// After navigation
+router.afterEach((to, from) => {
+  // Remove loading cursor
+  document.body.style.cursor = 'default';
+  
+  // Update page title
+  const baseTitle = 'Learning Management System';
+  document.title = to.meta.title ? `${to.meta.title} - ${baseTitle}` : baseTitle;
+  
+  // Track page views (có thể integrate với Google Analytics)
+  if (import.meta.env.PROD) {
+    // gtag('config', 'GA_MEASUREMENT_ID', {
+    //   page_title: document.title,
+    //   page_location: window.location.href,
+    // });
+  }
 });
 
 export default router;

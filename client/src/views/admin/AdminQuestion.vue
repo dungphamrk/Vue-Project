@@ -144,7 +144,7 @@ import {
   CaretUpOutlined,
   SearchOutlined,
 } from "@ant-design/icons-vue";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 import QuestionModal from "@/components/admin/modal/QuestionModal.vue";
 import { useRoute } from "vue-router";
 const route = useRoute();

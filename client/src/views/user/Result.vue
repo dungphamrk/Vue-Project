@@ -175,7 +175,8 @@ const fetchResult = async () => {
 
 const fetchExam = async () => {
   try {
-    const response = await axios.get("http://localhost:3000/exams");
+    const { buildApiUrl, API_ENDPOINTS } = await import('@/utils/api.js');
+    const response = await axios.get(buildApiUrl(API_ENDPOINTS.EXAMS));
     const examData = response.data.find((e) => e.id == result.value?.idExam);
     exam.value = examData || null;
   } catch (error) {
@@ -186,11 +187,9 @@ const fetchExam = async () => {
 // Fetch questionss
 const fetchQuestions = async () => {
   try {
-    const response = await axios.get("http://localhost:3000/questions");
-    const questionsData = response.data.filter(
-      (q) => q.idExam == result.value?.idExam
-    );
-    questions.value = questionsData;
+    const { buildApiUrl, API_ENDPOINTS } = await import('@/utils/api.js');
+    const response = await axios.get(buildApiUrl(API_ENDPOINTS.QUESTIONS_BY_EXAM(result.value?.idExam)));
+    questions.value = response.data;
   } catch (error) {
     console.error("Error fetching questions:", error);
   }
